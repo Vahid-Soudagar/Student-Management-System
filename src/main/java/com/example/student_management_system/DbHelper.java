@@ -1,5 +1,4 @@
 package com.example.student_management_system;
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class DbHelper {

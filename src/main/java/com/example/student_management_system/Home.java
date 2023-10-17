@@ -44,9 +44,21 @@ public class Home extends Application {
         teacherButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-alignment: center;");
         adminButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-alignment: center;");
 
-        studentButton.setOnAction(e -> openLoginScreen());
-        teacherButton.setOnAction(e -> openLoginScreen());
-        adminButton.setOnAction(e -> openLoginScreen());
+        studentButton.setOnAction(e -> {
+           Login login = new Login("Student");
+           openLoginScreen(login);
+        });
+
+        teacherButton.setOnAction(e -> {
+            Login login = new Login("Teacher");
+            openLoginScreen(login);
+        });
+
+        adminButton.setOnAction(e -> {
+            Login login = new Login("Admin");
+            openLoginScreen(login);
+        });
+
 
         hBox.getChildren().addAll(studentButton, teacherButton, adminButton);
         hBox.setAlignment(Pos.CENTER);
@@ -57,8 +69,7 @@ public class Home extends Application {
         return root;
     }
 
-    private void openLoginScreen() {
-        Login login = new Login();
+    private void openLoginScreen(Login login) {
         Stage loginStage = new Stage();
         Scene loginScene = new Scene(login.createContents(), 1080, 720);
         loginStage.setScene(loginScene);
@@ -67,6 +78,7 @@ public class Home extends Application {
         homeStage.close();
         loginStage.show();
     }
+
     @Override
     public void start(Stage stage) throws IOException {
         homeStage = stage;
