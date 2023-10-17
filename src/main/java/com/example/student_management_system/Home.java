@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Home extends Application {
+    private Stage homeStage;
 
     private BorderPane createContent() {
         BorderPane root = new BorderPane();
@@ -59,21 +60,22 @@ public class Home extends Application {
     private void openLoginScreen() {
         Login login = new Login();
         Stage loginStage = new Stage();
-        Scene loginScene = new Scene(login.createContent(), 1080, 720);
+        Scene loginScene = new Scene(login.createContents(), 1080, 720);
         loginStage.setScene(loginScene);
         loginStage.setResizable(false);
         loginStage.setTitle("Login");
+        homeStage.close();
         loginStage.show();
     }
     @Override
     public void start(Stage stage) throws IOException {
+        homeStage = stage;
         BorderPane root = createContent();
         Scene scene = new Scene(root, 1080, 720);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Student Management System!");
         stage.show();
-
     }
 
     public static void main(String[] args) {
