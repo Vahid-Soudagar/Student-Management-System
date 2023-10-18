@@ -11,14 +11,22 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+/*
+    This code defines a JavaFX application called "Student Management System."
+    It presents a simple user interface with a title, asks the user to select their role (Student, Teacher, or Admin),
+    and provides buttons for each role. When a role is selected,
+    it opens a login screen specific to that role.
+    The code is organized into methods and well-styled, making it clear and easy to understand.
+ */
 
 public class Home extends Application {
     private Stage homeStage;
 
+    // Create the main content of the Home class
     private BorderPane createContent() {
         BorderPane root = new BorderPane();
 
-//      title
+        // Title label for the application
         Label titleLabel = new Label();
         titleLabel.setText("Student Management System");
         titleLabel.setStyle("-fx-font-size: 40px; -fx-font-weight: bold;");
@@ -26,27 +34,29 @@ public class Home extends Application {
         BorderPane.setMargin(titleLabel, new Insets(200, 0, 0, 0));
         root.setTop(titleLabel);
 
-//        role title
+        // Label asking the user's role
         Label roleLabel = new Label();
         roleLabel.setText("You are a?");
         roleLabel.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
         BorderPane.setAlignment(roleLabel, Pos.CENTER);
         root.setCenter(roleLabel);
 
-//        buttons
+        // Create buttons for different roles
         HBox hBox = new HBox();
         hBox.setSpacing(20);
-        Button studentButton = new Button("Student");  // Set the text here
-        Button teacherButton = new Button("Teacher");  // Set the text here
-        Button adminButton = new Button("Admin");      // Set the text here
+        Button studentButton = new Button("Student");
+        Button teacherButton = new Button("Teacher");
+        Button adminButton = new Button("Admin");
 
+        // Styling for role buttons
         studentButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-alignment: center;");
         teacherButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-alignment: center;");
         adminButton.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-alignment: center;");
 
+        // Actions for the role buttons
         studentButton.setOnAction(e -> {
-           Login login = new Login("Student");
-           openLoginScreen(login);
+            Login login = new Login("Student");
+            openLoginScreen(login);
         });
 
         teacherButton.setOnAction(e -> {
@@ -59,16 +69,15 @@ public class Home extends Application {
             openLoginScreen(login);
         });
 
-
         hBox.getChildren().addAll(studentButton, teacherButton, adminButton);
         hBox.setAlignment(Pos.CENTER);
         BorderPane.setMargin(hBox, new Insets(0, 0, 300, 0));
-        root.setBottom(hBox);  // Add the HBox to the bottom region of the BorderPane
-
+        root.setBottom(hBox);
 
         return root;
     }
 
+    // Open the login screen for the selected role
     private void openLoginScreen(Login login) {
         Stage loginStage = new Stage();
         Scene loginScene = new Scene(login.createContents(), 1080, 720);
