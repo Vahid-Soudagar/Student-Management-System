@@ -3,6 +3,7 @@ package com.example.student_management_system;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,7 +20,7 @@ public class AdminAddStudent extends Application {
     final String LABEL_STYLE = "-fx-font-size: 14px;";
     private Stage primaryStage;
 
-    private TextField tfStudentId, tfFirstName, tfMidName, tfLastName, tfMobileNumber, tfDivision, tfTeacherName, tfTeacherId;
+    private TextField tfFirstName, tfMidName, tfLastName, tfMobileNumber, tfDivision, tfTeacherName, tfTeacherId;
     private TextArea tfAddress;
     private DatePicker dpDateOfBirth;
     private ComboBox<String> cbStandard;
@@ -36,11 +37,6 @@ public class AdminAddStudent extends Application {
         header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold");
         GridPane.setColumnSpan(header, 3);
         GridPane.setHalignment(header, HPos.CENTER);
-
-        Label lbStudentId = new Label("Enter Student Id:");
-        lbStudentId.setStyle(LABEL_STYLE);
-        GridPane.setHalignment(lbStudentId, HPos.RIGHT);
-        tfStudentId = new TextField();
 
         Label lbFirstName = new Label("Enter Firstname:");
         lbFirstName.setStyle(LABEL_STYLE);
@@ -190,8 +186,6 @@ public class AdminAddStudent extends Application {
         root.add(selectImage, 5, 4);
         root.add(imageView, 4, 5);
 
-        root.add(lbStudentId, 0, 6);
-        root.add(tfStudentId, 1, 7);
 
         root.add(submitButton, 3, 6);
 
@@ -200,7 +194,6 @@ public class AdminAddStudent extends Application {
 
     private boolean insertStudent() throws ClassNotFoundException {
         Student student = new Student();
-        student.setStudentId(Integer.parseInt(tfStudentId.getText()));
         student.setFirstName(tfFirstName.getText());
         student.setSecondName(tfMidName.getText());
         student.setLastName(tfLastName.getText());
@@ -213,12 +206,20 @@ public class AdminAddStudent extends Application {
         student.setTeacherName(tfTeacherName.getText());
         student.setTeacherId(Integer.parseInt(tfTeacherId.getText()));
         student.setPhotoUrl(imageUrl);
-        student.setPassword(student.getStudentId()+"@"+student.getStandard()+student.getDivision());
 
         DbHelper dbHelper = new DbHelper();
         dbHelper.createStudentsTable();
+        int studentId = dbHelper.getNextStudentId();
+        student.setStudentId(studentId);
+
+        String standard = student.getStandard();
+        String division = student.getDivision();
+        String password = "P"+studentId+"@"+standard+division.toLowerCase();
+        student.setPassword(password);
+
         boolean studentAdded = dbHelper.addStudent(student);
-        if (studentAdded) {
+        boolean userAdded = dbHelper.addUser(student.getStudentId(), student.getPassword(), "Student");
+        if (studentAdded && userAdded) {
             return true;
         } else {
             return false;
@@ -226,7 +227,6 @@ public class AdminAddStudent extends Application {
     }
 
     private void clearStudentFields() {
-        tfStudentId.clear();
         tfFirstName.clear();
         tfMidName.clear();
         tfLastName.clear();
@@ -242,8 +242,7 @@ public class AdminAddStudent extends Application {
 
 
     private boolean areFieldsValid() {
-        return !tfStudentId.getText().isEmpty() &&
-                !tfFirstName.getText().isEmpty() &&
+        return !tfFirstName.getText().isEmpty() &&
                 !tfMidName.getText().isEmpty() &&
                 !tfLastName.getText().isEmpty() &&
                 dpDateOfBirth.getValue() != null &&
@@ -260,6 +259,13 @@ public class AdminAddStudent extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
+        stage.setTitle("Admin Search Student");
+        // Create the UI content
+        GridPane root = createContents();
+        // Create a scene and set it on the stage
+        Scene scene = new Scene(root, 1080, 720);
+        stage.setScene(scene);
+        stage.show();
     }
 
     public static void main(String[] args) {

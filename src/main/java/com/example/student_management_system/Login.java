@@ -55,10 +55,9 @@ public class Login extends Application {
             try {
                 boolean exist = userExist();
                 if (exist && userType.equals("Admin")) {
-                    if (loginStage != null) {
-                        loginStage.close();
-                    }
                     openAdminHomeScreen(new AdminHome());
+                    Stage stage = (Stage) loginButton.getScene().getWindow();
+                    stage.close();
                 }
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);

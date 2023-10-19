@@ -5,7 +5,7 @@ public class DbHelper {
 
     private final String DRIVER = "org.postgresql.Driver";
     private final String URL = "jdbc:postgresql://localhost:5432/";
-    private final String DATABASE_NAME = "StudentManagement";
+    private final String DATABASE_NAME = "StudentManagementSystem";
     private final String USER_TABLE = "Users";
     private final String STUDENT_TABLE = "Students";
     private final String USER = "postgres";
@@ -17,7 +17,7 @@ public class DbHelper {
         try {
             Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
             String query = "CREATE TABLE IF NOT EXISTS "+ USER_TABLE + " (" +
-                    " userid serial PRIMARY KEY," +
+                    " userid INT PRIMARY KEY NOT NULL," +
                     " password VARCHAR(16) NOT NULL," +
                     " role VARCHAR(10) NOT NULL"+
                     " )";
@@ -29,32 +29,109 @@ public class DbHelper {
         }
     }
 
-    public void createStudentsTable() throws ClassNotFoundException {
-         Class.forName(DRIVER);
-         try {
-             Connection connection = DriverManager.getConnection(URL+DATABASE_NAME, USER, PASSWORD);
-             String query = "CREATE TABLE IF NOT EXISTS " + STUDENT_TABLE + " (" +
-                     "studentId INT PRIMARY KEY NOT NULL, " +
-                     "password VARCHAR(16) NOT NULL,"+
-                     "firstName VARCHAR(255) NOT NULL, " +
-                     "secondName VARCHAR(255) NOT NULL, " +
-                     "lastName VARCHAR(255) NOT NULL, " +
-                     "dateOfBirth DATE NOT NULL, " +
-                     "address VARCHAR(255) NOT NULL, " +
-                     "mobileNumber VARCHAR(15) NOT NULL, " +
-                     "standard VARCHAR(10) NOT NULL, " +
-                     "division VARCHAR(10) NOT NULL, " +
-                     "teacherName VARCHAR(255) NOT NULL, " +
-                     "teacherId INT NOT NULL, " +
-                     "photoUrl VARCHAR(255) NOT NULL" +
-                     ")";
+    public boolean addUser(int userId, String password, String role) {
+        try {
+            Class.forName(DRIVER);
+            Connection connection = DriverManager.getConnection(URL+DATABASE_NAME, USER, PASSWORD);
+            String query = "INSERT INTO "+USER_TABLE+" (userId, password, role) "+
+                    " VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, role);
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                // Data inserted successfully
+                System.out.println("Student added successfully.");
+                return true;
+            } else {
+                // Handle error or show a message if needed
+                return false;
+            }
 
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             preparedStatement.executeUpdate();
-             System.out.println("Student table created");
-         } catch (SQLException e) {
-             throw new RuntimeException(e);
-         }
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+    }
+    public boolean isUserExist(int userid, String password, String role) {
+        try {
+            String query = "SELECT COUNT(*) FROM "+ USER_TABLE +" WHERE userid = ? AND password = ? AND role = ?";
+            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userid);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, role);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+//    public void createStudentsTable() throws ClassNotFoundException {
+//        Class.forName(DRIVER);
+//        try {
+//            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+//            String query = "CREATE TABLE IF NOT EXISTS " + STUDENT_TABLE + " (" +
+//                    "studentId INT PRIMARY KEY NOT NULL, " +
+//                    "password VARCHAR(16) NOT NULL," +
+//                    "firstName VARCHAR(255) NOT NULL, " +
+//                    "secondName VARCHAR(255) NOT NULL, " +
+//                    "lastName VARCHAR(255) NOT NULL, " +
+//                    "dateOfBirth DATE NOT NULL, " +
+//                    "address VARCHAR(255) NOT NULL, " +
+//                    "mobileNumber VARCHAR(15) NOT NULL, " +
+//                    "standard VARCHAR(10) NOT NULL, " +
+//                    "division VARCHAR(10) NOT NULL, " +
+//                    "teacherName VARCHAR(255) NOT NULL, " +
+//                    "teacherId INT NOT NULL, " +
+//                    "photoUrl VARCHAR(255) NOT NULL" +
+//                    ")";
+//            PreparedStatement preparedStatement = connection.prepareStatement(query);
+//            preparedStatement.executeUpdate();
+//            System.out.println("Student table created");
+//        } catch (SQLException e) {
+//            System.out.println(e.getMessage());
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+
+    public void createStudentsTable() throws ClassNotFoundException {
+        Class.forName(DRIVER);
+        try {
+            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+            String query = "CREATE TABLE IF NOT EXISTS " + STUDENT_TABLE + " (" +
+                    "studentId INT DEFAULT nextval('my_seq'::regclass) PRIMARY KEY, " +
+                    "password VARCHAR(16) NOT NULL," +
+                    "firstName VARCHAR(255) NOT NULL, " +
+                    "secondName VARCHAR(255) NOT NULL, " +
+                    "lastName VARCHAR(255) NOT NULL, " +
+                    "dateOfBirth DATE NOT NULL, " +
+                    "address VARCHAR(255) NOT NULL, " +
+                    "mobileNumber VARCHAR(15) NOT NULL, " +
+                    "standard VARCHAR(10) NOT NULL, " +
+                    "division VARCHAR(10) NOT NULL, " +
+                    "teacherName VARCHAR(255) NOT NULL, " +
+                    "teacherId INT NOT NULL, " +
+                    "photoUrl VARCHAR(255) NOT NULL" +
+                    ")";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.executeUpdate();
+            System.out.println("Student table created");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean addStudent(Student student) throws ClassNotFoundException {
@@ -100,23 +177,96 @@ public class DbHelper {
         return false;
     }
 
-    public boolean isUserExist(int userid, String password, String role) {
+    public Student searchStudent(int studentId) {
+        Student student = null;
         try {
-            String query = "SELECT COUNT(*) FROM "+ USER_TABLE +" WHERE userid = ? AND password = ? AND role = ?";
-            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+            Class.forName(DRIVER);
+            Connection connection = DriverManager.getConnection(URL+DATABASE_NAME, USER, PASSWORD);
+            String query = "SELECT * FROM "+STUDENT_TABLE+" WHERE studentid = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, userid);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, role);
-
+            preparedStatement.setInt(1, studentId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                int count = resultSet.getInt(1);
-                return count > 0;
+                student = new Student();
+                student.setStudentId(resultSet.getInt("studentId"));
+                student.setPassword(resultSet.getString("password"));
+                student.setFirstName(resultSet.getString("firstName"));
+                student.setSecondName(resultSet.getString("secondName"));
+                student.setLastName(resultSet.getString("lastName"));
+                student.setDateOfBirth(new Date(resultSet.getDate("dateOfBirth").getDate()));
+                student.setAddress(resultSet.getString("address"));
+                student.setMobileNumber(resultSet.getString("mobileNumber"));
+                student.setStandard(resultSet.getString("standard"));
+                student.setDivision(resultSet.getString("division"));
+                student.setTeacherName(resultSet.getString("teacherName"));
+                student.setTeacherId(resultSet.getInt("teacherId"));
+                student.setPhotoUrl(resultSet.getString("photoUrl"));
+
             }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return false;
+
+        return student;
+
     }
+
+    public boolean deleteStudent(int studentId) {
+        try {
+            Class.forName(DRIVER);
+            Connection connection = DriverManager.getConnection(URL+DATABASE_NAME, USER, PASSWORD);
+            String deleteFromStudentTable = "DELETE FROM "+STUDENT_TABLE+ " WHERE studentId = ?";
+//            String deleteFromUserTable = "DELETE FROM "+USER_TABLE+ " WHERE userId = ?";
+//            PreparedStatement userTablePS = connection.prepareStatement(deleteFromUserTable);
+            PreparedStatement studentTablePS = connection.prepareStatement(deleteFromStudentTable);
+            studentTablePS.setInt(1, studentId);
+            int rowsEffected = studentTablePS.executeUpdate();
+            if (rowsEffected > 0) {
+                System.out.println("Student with ID " + studentId + " deleted successfully.");
+                return true;
+            } else {
+                System.out.println("Student with ID " + studentId + " not found.");
+                return false;
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getNextStudentId() throws ClassNotFoundException {
+        Class.forName(DRIVER);
+        Connection connection = null;
+        int nextStudentId = 300000;  // Set the starting value
+
+        try {
+            connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+            Statement stmt = connection.createStatement();
+
+            // Get the current maximum student ID from the database
+            ResultSet rs = stmt.executeQuery("SELECT MAX(studentId) FROM " + STUDENT_TABLE);
+
+            if (rs.next()) {
+                int maxStudentId = rs.getInt(1);
+                // Increment the maximum student ID to get the next student ID
+                nextStudentId = Math.max(maxStudentId + 1, 300000);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle this error appropriately
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return nextStudentId;
+    }
+
 }

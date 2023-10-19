@@ -35,6 +35,10 @@ public class AdminHome extends Application {
         Button searchStudent = new Button();
         searchStudent.setText("Search Student");
         searchStudent.setStyle("-fx-font-size: 24px; -fx-min-width: 200px; -fx-min-height: 50px;");
+        searchStudent.setOnAction(e -> {
+            openAdminSearchStudent();
+        });
+
 
         student.getChildren().addAll(addStudent, searchStudent);
 
@@ -67,6 +71,16 @@ public class AdminHome extends Application {
         adminAddStudentStage.setTitle("Add Students");
         adminAddStudentStage.show();
 
+    }
+
+    private void openAdminSearchStudent() {
+        AdminSearchStudent adminSearchStudent = new AdminSearchStudent();
+        Stage adminSearchStudentStage = new Stage();
+        Scene adminSearchStudentScene = new Scene(adminSearchStudent.createContents(), 1080,720);
+        adminSearchStudentStage.setScene(adminSearchStudentScene);
+        adminSearchStudentStage.setResizable(false);
+        adminSearchStudentStage.setTitle("Search Students");
+        adminSearchStudentStage.show();
     }
     @Override
     public void start(Stage stage) throws Exception {
