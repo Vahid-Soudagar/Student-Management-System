@@ -3,101 +3,44 @@ package com.example.student_management_system;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.util.Date;
 
-public class AdminSearchStudent extends Application {
+public class StudentHomeScreen extends Application {
 
     private Student searchedStudent;
     final String LABEL_STYLE = "-fx-font-size: 14px;";
     private TextField tfStandard, tfDateOfBirth, tfFirstName, tfMidName, tfLastName, tfMobileNumber, tfDivision, tfTeacherName, tfTeacherId;
     private TextArea tfAddress;
-    private GridPane gridPane;
     private TextField searchField;
+    private int studentId;
 
-    BorderPane createContents() {
+    public StudentHomeScreen(int studentId) {
+        this.studentId = studentId;
+    }
+
+    BorderPane createContents(){
         BorderPane root = new BorderPane();
-
-        VBox vBox = new VBox(20);
-        Label header = new Label("Search Student Details");
-        header.setStyle("-fx-font-size: 20px; -fx-font-weight: bold");
-        vBox.setAlignment(Pos.CENTER);
-        HBox hBox = new HBox(20);
-        searchField = new TextField();
-        searchField.setPromptText("Enter Student Id");
-        searchField.setPrefWidth(400);
-        Button searchButton = new Button("Search");
-        searchButton.setOnAction(event -> {
-            boolean studentFound = searchStudent(Integer.parseInt(searchField.getText()));
-            if (studentFound) {
-                gridPane = fillData();
-                root.setCenter(gridPane);
-                editableSetFalse();
-                VBox vBox1 = operations();
-                vBox1.setAlignment(Pos.CENTER);
-                root.setPadding(new Insets(0, 30, 0, 0));
-                root.setRight(vBox1);
-            }
-        });
-        hBox.getChildren().addAll(searchField, searchButton);
-        hBox.setAlignment(Pos.CENTER);
-
-        vBox.getChildren().addAll(header, hBox);
-
-        root.setTop(vBox);
+        searchStudent();
+        GridPane gridPane = fillData();
+        root.setCenter(gridPane);
+        editableSetFalse();
         return root;
     }
-    private VBox operations() {
-        VBox root = new VBox(20);
 
-        Button editDetails = new Button("Edit Details");
-        editDetails.setOnAction(event -> {
-            editableSetTrue();
-            Button button = new Button("Update Details");
-            gridPane.add(button, 3,9);
-            button.setOnAction(event1 -> updateStudentDetails());
-        });
-
-
-        Button deleteStudent = new Button("Delete Student");
-        deleteStudent.setOnAction(event -> {
-            boolean deleted = deleteStudent(searchedStudent.getStudentId());
-            if (deleted) {
-                gridPane.getChildren().clear();
-            }
-        });
-        editDetails.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
-        deleteStudent.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
-        root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(editDetails, deleteStudent);
-        return root;
-    }
-    private boolean deleteStudent(int studentId) {
+    private void searchStudent(){
         DbHelper dbHelper = new DbHelper();
-        boolean deleted = dbHelper.deleteStudent(studentId);
-        if (deleted) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("Student Deleted");
-            alert.setContentText("Student with "+searchedStudent.getStudentId()+" is deleted");
-            alert.show();
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Something went wrong");
-            alert.setHeaderText("Student can't be Deleted");
-            alert.setContentText("Student is not Deleted");
-            alert.show();
-            return false;
-        }
+        searchedStudent = dbHelper.searchStudent(studentId);
     }
+
     private GridPane fillData() {
         GridPane root = new GridPane();
         root.setPadding(new Insets(20, 0, 20, 20));
@@ -232,31 +175,6 @@ public class AdminSearchStudent extends Application {
         root.add(imageView, 5, 7);
         return root;
     }
-    private boolean searchStudent(int studentId) {
-        DbHelper dbHelper = new DbHelper();
-        searchedStudent = dbHelper.searchStudent(studentId);
-        if (searchedStudent != null) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Something went wrong");
-            alert.setHeaderText("No Student Found");
-            alert.setContentText("Check Student Id or Enter valid student Id");
-            alert.show();
-            return false;
-        }
-    }
-    private void editableSetTrue() {
-        tfStandard.setEditable(true);
-        tfDateOfBirth.setEditable(true);
-        tfFirstName.setEditable(true);
-        tfMidName.setEditable(true);
-        tfLastName.setEditable(true);
-        tfMobileNumber.setEditable(true);
-        tfDivision.setEditable(true);
-        tfTeacherName.setEditable(true);
-        tfTeacherId.setEditable(true);
-    }
 
     private void editableSetFalse() {
         tfStandard.setEditable(false);
@@ -270,32 +188,13 @@ public class AdminSearchStudent extends Application {
         tfTeacherId.setEditable(false);
     }
 
-    private void updateStudentDetails() {
-        DbHelper dbHelper = new DbHelper();
-        Student student = dbHelper.searchStudent(Integer.parseInt(searchField.getText()));
-        boolean isUpdated = dbHelper.updateStudentDetails(student.getStudentId(), student);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Update Student");
-        if (isUpdated) {
-            alert.setHeaderText("Student details Updated");
-            alert.setContentText("Student Details Updated successfully");
-        } else {
-            alert.setHeaderText("Student details is not updated");
-            alert.setContentText("Failed to update student details, try after again after sometime");
-        }
-        alert.show();
-    }
+//    TODO - write functionality of the student to change its password see result
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setTitle("Admin Search Student");
-        // Create the UI content
-        BorderPane root = createContents();
-        // Create a scene and set it on the stage
-        Scene scene = new Scene(root, 1080, 720);
-        stage.setScene(scene);
-        stage.show();
+
     }
+
     public static void main(String[] args) {
         launch();
     }

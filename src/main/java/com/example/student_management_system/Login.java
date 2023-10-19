@@ -42,10 +42,13 @@ public class Login extends Application {
         userIdField.setPromptText("Enter User ID");
         userIdField.setMaxSize(200, 20);
 
+
+//        TODO - Password toggle
         // Password Input Field
         passwordField = new PasswordField();
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxSize(200, 20);
+
 
         // Login Button
         Button loginButton = new Button("Login");
@@ -56,6 +59,13 @@ public class Login extends Application {
                 boolean exist = userExist();
                 if (exist && userType.equals("Admin")) {
                     openAdminHomeScreen(new AdminHome());
+                    Stage stage = (Stage) loginButton.getScene().getWindow();
+                    stage.close();
+                }
+
+                if (exist && userType.equals("Student")) {
+                    StudentHomeScreen studentHomeScreen = new StudentHomeScreen(Integer.parseInt(userIdField.getText()));
+                    openStudentHomeScreen(studentHomeScreen);
                     Stage stage = (Stage) loginButton.getScene().getWindow();
                     stage.close();
                 }
@@ -134,6 +144,18 @@ public class Login extends Application {
             loginStage.close();
         }
         adminHomeStage.show();
+    }
+
+    private void openStudentHomeScreen(StudentHomeScreen studentHomeScreen) {
+        Stage studentHomeStage = new Stage();
+        Scene studentHomeScene = new Scene(studentHomeScreen.createContents(), 1080, 720);
+        studentHomeStage.setScene(studentHomeScene);
+        studentHomeStage.setResizable(false);
+        studentHomeStage.setTitle("Student Home");
+        if (loginStage != null) {
+            loginStage.close();
+        }
+        studentHomeStage.show();
     }
 
     @Override

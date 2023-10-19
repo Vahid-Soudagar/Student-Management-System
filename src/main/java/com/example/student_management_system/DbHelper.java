@@ -49,15 +49,13 @@ public class DbHelper {
                 return false;
             }
 
-        } catch (ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
 
     }
+
     public boolean isUserExist(int userid, String password, String role) {
         try {
             String query = "SELECT COUNT(*) FROM "+ USER_TABLE +" WHERE userid = ? AND password = ? AND role = ?";
@@ -77,34 +75,6 @@ public class DbHelper {
         }
         return false;
     }
-//    public void createStudentsTable() throws ClassNotFoundException {
-//        Class.forName(DRIVER);
-//        try {
-//            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
-//            String query = "CREATE TABLE IF NOT EXISTS " + STUDENT_TABLE + " (" +
-//                    "studentId INT PRIMARY KEY NOT NULL, " +
-//                    "password VARCHAR(16) NOT NULL," +
-//                    "firstName VARCHAR(255) NOT NULL, " +
-//                    "secondName VARCHAR(255) NOT NULL, " +
-//                    "lastName VARCHAR(255) NOT NULL, " +
-//                    "dateOfBirth DATE NOT NULL, " +
-//                    "address VARCHAR(255) NOT NULL, " +
-//                    "mobileNumber VARCHAR(15) NOT NULL, " +
-//                    "standard VARCHAR(10) NOT NULL, " +
-//                    "division VARCHAR(10) NOT NULL, " +
-//                    "teacherName VARCHAR(255) NOT NULL, " +
-//                    "teacherId INT NOT NULL, " +
-//                    "photoUrl VARCHAR(255) NOT NULL" +
-//                    ")";
-//            PreparedStatement preparedStatement = connection.prepareStatement(query);
-//            preparedStatement.executeUpdate();
-//            System.out.println("Student table created");
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//            throw new RuntimeException(e);
-//        }
-//    }
-
 
     public void createStudentsTable() throws ClassNotFoundException {
         Class.forName(DRIVER);
@@ -193,6 +163,7 @@ public class DbHelper {
                 student.setFirstName(resultSet.getString("firstName"));
                 student.setSecondName(resultSet.getString("secondName"));
                 student.setLastName(resultSet.getString("lastName"));
+//                TODO - CHECK IT FOR THE IMPROPER DATE SHOWN ON SEARCH STUDENT ADMIN PANEL
                 student.setDateOfBirth(new Date(resultSet.getDate("dateOfBirth").getDate()));
                 student.setAddress(resultSet.getString("address"));
                 student.setMobileNumber(resultSet.getString("mobileNumber"));
@@ -203,9 +174,7 @@ public class DbHelper {
                 student.setPhotoUrl(resultSet.getString("photoUrl"));
 
             }
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         }
 
@@ -236,6 +205,54 @@ public class DbHelper {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean updateStudentDetails(int studentId, Student updatedStudent) {
+        try {
+            Class.forName(DRIVER);
+            Connection connection = DriverManager.getConnection(URL + DATABASE_NAME, USER, PASSWORD);
+            String updateQuery = "UPDATE " + STUDENT_TABLE + " SET " +
+                    "firstName = ?, " +
+                    "secondName = ?, " +
+                    "lastName = ?, " +
+                    "dateOfBirth = ?, " +
+                    "address = ?, " +
+                    "mobileNumber = ?, " +
+                    "standard = ?, " +
+                    "division = ?, " +
+                    "teacherName = ?, " +
+                    "teacherId = ?, " +
+                    "photoUrl = ? " +
+                    "WHERE studentId = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
+
+            preparedStatement.setString(1, updatedStudent.getFirstName());
+            preparedStatement.setString(2, updatedStudent.getSecondName());
+            preparedStatement.setString(3, updatedStudent.getLastName());
+            preparedStatement.setDate(4, updatedStudent.getDateOfBirth());
+            preparedStatement.setString(5, updatedStudent.getAddress());
+            preparedStatement.setString(6, updatedStudent.getMobileNumber());
+            preparedStatement.setString(7, updatedStudent.getStandard());
+            preparedStatement.setString(8, updatedStudent.getDivision());
+            preparedStatement.setString(9, updatedStudent.getTeacherName());
+            preparedStatement.setInt(10, updatedStudent.getTeacherId());
+            preparedStatement.setString(11, updatedStudent.getPhotoUrl());
+            preparedStatement.setInt(12, studentId);
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Updated");
+                return true;
+            } else {
+                System.out.println("Not updated");
+                return false;
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public int getNextStudentId() throws ClassNotFoundException {
         Class.forName(DRIVER);
