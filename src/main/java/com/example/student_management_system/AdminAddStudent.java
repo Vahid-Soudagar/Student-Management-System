@@ -54,7 +54,7 @@ public class AdminAddStudent extends Application {
         tfLastName = new TextField();
 
         Label lbDateOfBirth = new Label("Enter DOB: ");
-        lbLastName.setStyle(LABEL_STYLE);
+        lbDateOfBirth.setStyle(LABEL_STYLE);
         GridPane.setHalignment(lbDateOfBirth, HPos.LEFT);
         dpDateOfBirth = new DatePicker();
 
@@ -226,6 +226,8 @@ public class AdminAddStudent extends Application {
         }
     }
 
+
+
     private void clearStudentFields() {
         tfFirstName.clear();
         tfMidName.clear();
@@ -237,9 +239,7 @@ public class AdminAddStudent extends Application {
         tfDivision.clear();
         tfTeacherName.clear();
         tfTeacherId.clear();
-        // Clear any other fields as needed
     }
-
 
     private boolean areFieldsValid() {
         return !tfFirstName.getText().isEmpty() &&
@@ -253,8 +253,6 @@ public class AdminAddStudent extends Application {
                 !tfTeacherName.getText().isEmpty() &&
                 !tfTeacherId.getText().isEmpty();
     }
-
-
 
     @Override
     public void start(Stage stage) throws Exception {

@@ -69,6 +69,13 @@ public class Login extends Application {
                     Stage stage = (Stage) loginButton.getScene().getWindow();
                     stage.close();
                 }
+
+                if (exist && userType.equals("Teacher")) {
+                    TeacherHomeScreen teacherHomeScreen = new TeacherHomeScreen(Integer.parseInt(userIdField.getText()));
+                    openTeacherHomeScreen(teacherHomeScreen);
+                    Stage stage = (Stage) loginButton.getScene().getWindow();
+                    stage.close();
+                }
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
@@ -156,6 +163,15 @@ public class Login extends Application {
             loginStage.close();
         }
         studentHomeStage.show();
+    }
+
+    private void openTeacherHomeScreen(TeacherHomeScreen teacherHomeScreen) {
+        Stage teacherHomeStage = new Stage();
+        Scene teacherHomeScene = new Scene(teacherHomeScreen.createContents(), 1080, 720);
+        teacherHomeStage.setScene(teacherHomeScene);
+        teacherHomeStage.setResizable(false);
+        teacherHomeStage.setTitle("Teacher Home");
+        teacherHomeStage.show();
     }
 
     @Override

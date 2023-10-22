@@ -65,7 +65,6 @@ public class AdminSearchStudent extends Application {
             button.setOnAction(event1 -> updateStudentDetails());
         });
 
-
         Button deleteStudent = new Button("Delete Student");
         deleteStudent.setOnAction(event -> {
             boolean deleted = deleteStudent(searchedStudent.getStudentId());
@@ -241,7 +240,7 @@ public class AdminSearchStudent extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Something went wrong");
             alert.setHeaderText("No Student Found");
-            alert.setContentText("Check Student Id or Enter valid student Id");
+            alert.setContentText("Check Student Id or Enter valid Ttudent Id");
             alert.show();
             return false;
         }

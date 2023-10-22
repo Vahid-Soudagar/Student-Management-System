@@ -49,11 +49,13 @@ public class AdminHome extends Application {
         Button addTeacher = new Button();
         addTeacher.setText("Add Teacher");
         addTeacher.setStyle("-fx-font-size: 24px; -fx-min-width: 200px; -fx-min-height: 50px;");
-
+        addTeacher.setOnAction(event -> openAdminAddTeacher());
         Button searchTeacher = new Button();
         searchTeacher.setText("Search Teacher");
         searchTeacher.setStyle("-fx-font-size: 24px; -fx-min-width: 200px; -fx-min-height: 50px;");
-
+        searchTeacher.setOnAction(event -> {
+            openAdminSearchTeacher();
+        });
         teacher.getChildren().addAll(addTeacher, searchTeacher);
 
         vBox.getChildren().addAll(student, teacher);
@@ -82,6 +84,27 @@ public class AdminHome extends Application {
         adminSearchStudentStage.setTitle("Search Students");
         adminSearchStudentStage.show();
     }
+
+    private void openAdminAddTeacher() {
+        AdminAddTeacher adminAddTeacher = new AdminAddTeacher();
+        Stage stage = new Stage();
+        Scene scene = new Scene(adminAddTeacher.createContents(), 1080, 720);
+        stage.setScene(scene);
+        stage.setTitle("Admin Add Teacher");
+        stage.setResizable(false);
+        stage.show();
+    }
+
+    private void openAdminSearchTeacher() {
+        AdminSearchTeacher adminSearchTeacher = new AdminSearchTeacher();
+        Stage stage = new Stage();
+        Scene scene = new Scene(adminSearchTeacher.createContents(), 1080, 720);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("Search Teacher");
+        stage.show();
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         BorderPane root = createContents();
